@@ -1,9 +1,7 @@
-"""Welcome to Reflex! This file outlines the steps to create a basic app."""
-
 import reflex as rx
-
 from rxconfig import config
-
+from . import pages
+from .ui.base import base_page
 
 class State(rx.State):
     """The app state."""
@@ -12,25 +10,6 @@ class State(rx.State):
     def handle_title_changed(self, value):
         self.label = value
 
-def navbar() -> rx.Component:
-    return rx.heading("SaaS", size="9")
-
-def base_page(child:rx.Component, hide_navbar=False, *args, **kwargs) -> rx.Component:
-    if not isinstance(child, rx.Component):
-        child = rx.heading("This is not valid child element")
-    if hide_navbar:
-        return rx.container(
-            child,
-            rx.logo(),
-            rx.color_mode.button(position="bottom-left"),
-        )        
-    else:
-        return rx.container(
-            navbar(),
-            child,
-            rx.logo(),
-            rx.color_mode.button(position="bottom-left"),
-        )
 
 def index() -> rx.Component:
     # Welcome Page (Index)
@@ -52,9 +31,13 @@ def index() -> rx.Component:
             spacing="5",
             justify="center",
             min_height="85vh",
+            align="center",
+            text_align="center",
         ),
     )
 
 
 app = rx.App()
 app.add_page(index)
+app.add_page(pages.about_page, route="/about")
+app.add_page(pages.pricing_page, route="/pricing")
