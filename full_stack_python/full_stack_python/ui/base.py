@@ -1,6 +1,6 @@
 import reflex as rx
 
-from .nav import navbar_buttons
+from .nav import navbar
 
 def base_page(child:rx.Component, hide_navbar=False, *args, **kwargs) -> rx.Component:
     if not isinstance(child, rx.Component):
@@ -13,7 +13,7 @@ def base_page(child:rx.Component, hide_navbar=False, *args, **kwargs) -> rx.Comp
         )        
     else:
         return rx.container(
-            navbar_buttons(),
+            navbar(),
             child,
             rx.logo(),
             rx.color_mode.button(position="bottom-left"),
