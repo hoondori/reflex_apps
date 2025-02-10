@@ -2,6 +2,26 @@ import reflex as rx
 import asyncio
 from ..ui.base import base_page
 from .. import navigation
+from sqlmodel import Field
+import sqlalchemy
+from datetime import datetime, timezone
+
+def get_utc_now():
+    return datetime.now(timezone.utc)
+
+class ContactEntryModel(rx.Model, table=True):
+    first_name: str
+    last_name: str | None = None
+    email: str = Field(nullable=True)
+    message: str 
+    created_at: datetime = Field(
+        default_factory=get_utc_now,
+        sa_type=sqlalchemy.DateTime(timezone=True),
+        sa_column_kwargs={
+            'server_default': sqlalchemy.func.now()
+        },
+        nullable=False
+    )
 
 class ContactState(rx.State):
     form_data: dict = {}
@@ -23,22 +43,32 @@ class ContactState(rx.State):
 
     async def handle_submit(self, form_data: dict):
         self.form_data = form_data
-        self.did_submit = True
-        yield 
+        data = {}
+        for k, v in form_data.items():
+            if v == "" or v is None:
+                continue
+            data[k] = v
+        with rx.session() as session:
+            db_entry = ContactEntryModel(
+                **data
+            )
+            session.add(db_entry)
+            session.commit()
+            self.did_submit = True
+            yield 
 
         await asyncio.sleep(2)
         self.did_submit = False
         yield
 
-    async def start_timer(self):
-        while self.timeleft > 0:
-            await asyncio.sleep(1)
-            self.timeleft -= 1
-            yield
+    # async def start_timer(self):
+    #     while self.timeleft > 0:
+    #         await asyncio.sleep(1)
+    #         self.timeleft -= 1
+    #         yield
 
 @rx.page(
     route=navigation.routes.CONTACT_US,
-    on_load=ContactState.start_timer,
 )
 def contact_page() -> rx.Component:
     my_form = rx.form(
@@ -53,7 +83,6 @@ def contact_page() -> rx.Component:
                 rx.input(
                     name="last_name",
                     placeholder="Last Name",
-                    required=True,
                     width="100%"
                 ),
                  width="100%"
@@ -79,7 +108,6 @@ def contact_page() -> rx.Component:
     return base_page(
         rx.vstack(
             rx.heading("Contact Us", size="9"),
-            rx.text(ContactState.timeleft_label),
             rx.cond(ContactState.did_submit, ContactState.thank_you, ""),
             rx.desktop_only(
                 rx.box(my_form, width="50vw")),
