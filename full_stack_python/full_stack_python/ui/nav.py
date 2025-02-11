@@ -26,6 +26,7 @@ def navbar_desktop_menu() -> rx.Component:
     return rx.hstack(
         navbar_link("Home", routes.HOME),
         navbar_link("About", routes.ABOUT),
+        navbar_link("Blog", routes.BLOG),        
         navbar_link("Pricing", routes.PRICING),
         navbar_link("Contact", routes.CONTACT_US),
         spacing="5",
@@ -39,6 +40,7 @@ def navbar_mobile_menu() -> rx.Component:
         rx.menu.content(
             rx.menu.item("Home", on_click=rx.redirect(routes.HOME)),
             rx.menu.item("About", on_click=rx.redirect(routes.ABOUT)),
+            rx.menu.item("Blog", on_click=rx.redirect(routes.BLOG)),
             rx.menu.item("Pricing", on_click=rx.redirect(routes.PRICING)),
             rx.menu.item("Contact", on_click=rx.redirect(routes.CONTACT_US)),
             rx.menu.separator(),

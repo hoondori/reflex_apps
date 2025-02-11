@@ -1,9 +1,7 @@
 import reflex as rx
 from rxconfig import config
-from . import pages
 from .ui.base import base_page
-from .navigation import routes
-from . import contact
+from . import contact, navigation, blog, pages
 
 class State(rx.State):
     """The app state."""
@@ -41,8 +39,16 @@ def index() -> rx.Component:
 
 app = rx.App()
 app.add_page(index)
-app.add_page(pages.about_page, route=routes.ABOUT)
-app.add_page(pages.pricing_page, route=routes.PRICING)
-app.add_page(contact.contact_page, route=routes.CONTACT_US)
-app.add_page(contact.contact_entry_list_page, route=routes.CONTACT_ENTRIES, 
+app.add_page(pages.about_page, route=navigation.routes.ABOUT)
+app.add_page(pages.pricing_page, route=navigation.routes.PRICING)
+app.add_page(contact.contact_page, route=navigation.routes.CONTACT_US)
+app.add_page(contact.contact_entry_list_page, route=navigation.routes.CONTACT_ENTRIES, 
              on_load=contact.ContactState.list_entries)
+app.add_page(blog.blog_post_list_page, 
+             route=navigation.routes.BLOG,
+             on_load=blog.BlogPostState.load_posts)
+app.add_page(blog.blog_post_add_page, 
+             route=navigation.routes.BLOG_ADD)
+app.add_page(blog.blog_post_detail_page, 
+             route="/blog/[blog_id]",
+             on_load=blog.BlogPostState.get_post_detail)
