@@ -25,10 +25,17 @@ class MyRegisterState(reflex_local_auth.RegistrationState):
 
 
 class SessionState(reflex_local_auth.LocalAuthState):
+    
+    @rx.var(cache=True)
+    def authenticated_username(self) -> str | None:
+        if self.authenticated_user.id < 0:
+            return None
+        return self.authenticated_user.username 
+    
     @rx.var(cache=True)
     def authenticated_user_info(self) -> Optional[UserInfo]:
         if self.authenticated_user.id < 0:
-            return
+            return None
         with rx.session() as session:
             return session.exec(
                 sqlmodel.select(UserInfo).where(
