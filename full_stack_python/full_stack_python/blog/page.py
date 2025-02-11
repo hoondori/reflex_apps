@@ -5,14 +5,30 @@ from .. import navigation
 
 
 def blog_post_detail_page():
-    return base_page(
-        rx.vstack(
+
+    can_edit = True
+    edit_link = rx.link('Edit', href=f"/blog/{state.BlogPostState.blog_post_id}/edit")
+    edit_link_el = rx.cond(
+        can_edit,
+        edit_link,
+        rx.fragment("")
+    )
+    my_child = rx.vstack(
+        rx.hstack(
             rx.heading(state.BlogPostState.post.title, size="7"),
-            rx.text(state.BlogPostState.post.content),            
-            spacing="5",
-            align="center",
-            min_height="85vh",
-        )
+            edit_link_el,
+        ),
+        rx.text(
+            state.BlogPostState.post.content, 
+            white_space='pre-wrap',
+        ),            
+        spacing="5",
+        align="center",
+        min_height="85vh",
+    )
+
+    return base_page(
+        my_child
     )    
 
 def blog_post_detail_link(child: rx.Component, post: model.BlogPostModel):
@@ -52,24 +68,4 @@ def blog_post_list_page() -> rx.Component:
             align="center",
             min_height="85vh",
         )
-    )
-
-def blog_post_add_page() -> rx.Component:
-    my_form = form.blog_post_add_form()
-    my_child =  rx.vstack(
-        rx.heading("New Blog Post", size="9"),
-        rx.desktop_only(
-            rx.box(my_form, width="50vw")),
-        rx.tablet_only(
-            rx.box(my_form, width="80vw")),
-        rx.mobile_only(
-            rx.box(my_form, width="95vw")),
-        spacing="5",
-        justify="center",
-        align="center",
-        min_height="95vh",
-    )
-
-    return base_page(
-        my_child,
     )
