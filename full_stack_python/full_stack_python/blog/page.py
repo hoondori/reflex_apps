@@ -18,6 +18,7 @@ def blog_post_detail_page():
             rx.heading(state.BlogPostState.post.title, size="7"),
             edit_link_el,
         ),
+        rx.text(state.BlogPostState.post.publish_date),
         rx.text(
             state.BlogPostState.post.content, 
             white_space='pre-wrap',
