@@ -1,7 +1,7 @@
 import reflex as rx 
 from ..ui.base import base_page
 from .. import contact
-from ..contact.model import ContactEntryModel
+from .model import ContactEntryModel
 
 def contact_entry(entry: ContactEntryModel) -> rx.Component:
     return rx.vstack(

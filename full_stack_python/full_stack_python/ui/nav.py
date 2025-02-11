@@ -1,7 +1,7 @@
 import reflex as rx
 
 from ..navigation import routes
-
+import reflex_local_auth
 
 def navbar_link(text:str, url: str) -> rx.Component:
     return rx.link(
@@ -44,16 +44,23 @@ def navbar_mobile_menu() -> rx.Component:
             rx.menu.item("Pricing", on_click=rx.redirect(routes.PRICING)),
             rx.menu.item("Contact", on_click=rx.redirect(routes.CONTACT_US)),
             rx.menu.separator(),
-            rx.menu.item("Log in"),
-            rx.menu.item("Sign up"),
+            rx.menu.item("Log in", on_click=rx.redirect(reflex_local_auth.routes.LOGIN_ROUTE)),
+            rx.menu.item("Register", on_click=rx.redirect(reflex_local_auth.routes.REGISTER_ROUTE)),
         ),
         justify="end",
     )
 
 def navbar_auth() -> rx.Component:
     return rx.hstack(
-        rx.button("Sign Up", size="3", variant="outline"),
-        rx.button("Log In", size="3"),
+        rx.link(
+            rx.button("Register", size="3", variant="outline"),
+            href=reflex_local_auth.routes.REGISTER_ROUTE,
+            
+        ),
+        rx.link(
+            rx.button("Log In", size="3"),
+            href=reflex_local_auth.routes.LOGIN_ROUTE,
+        ),
         spacing="4",
         justify="end"
     )
