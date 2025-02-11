@@ -1,6 +1,25 @@
 import reflex as rx 
 from ..ui.base import base_page
 from .. import contact
+from ..contact.model import ContactEntryModel
+
+def contact_entry(entry: ContactEntryModel) -> rx.Component:
+    return rx.vstack(
+        rx.heading(entry.first_name, size="3"),
+        rx.text(entry.message),
+        padding="1em",
+    )
+
+def contact_entry_list_page() -> rx.Component:
+    return base_page(
+        rx.vstack(
+            rx.heading("Contact Entries", size="7"),
+            rx.foreach(contact.ContactState.entries, contact_entry),
+            spacing="5",
+            align="center",
+            min_height="85vh",
+        )
+    )
 
 def contact_page() -> rx.Component:
     my_form = contact.contact_form()
