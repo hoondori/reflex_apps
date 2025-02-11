@@ -1,5 +1,6 @@
 HOME='/'
 ABOUT='/about'
+PROTECTED='/protected'
 BLOG='/blog'
 BLOG_ADD='/blog/add'
 CONTACT_US='/contact'

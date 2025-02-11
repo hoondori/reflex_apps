@@ -3,6 +3,11 @@ from rxconfig import config
 from .ui.base import base_page
 from . import contact, navigation, blog, pages, auth
 import reflex_local_auth
+from .auth.page import (
+    my_login_page,
+    my_register_page
+)
+from .auth.state import SessionState
 
 class State(rx.State):
     """The app state."""
@@ -41,20 +46,23 @@ def index() -> rx.Component:
 app = rx.App()
 app.add_page(index)
 
-# local-auth pages
+# auth pages
 app.add_page(
-    auth.my_login_page,
+    my_login_page,
     route=reflex_local_auth.routes.LOGIN_ROUTE,
     title="Login",
 )
 app.add_page(
-    auth.my_register_page,
+    my_register_page,
     route=reflex_local_auth.routes.REGISTER_ROUTE,
     title="Register",
 )
 
 # my page
 app.add_page(pages.about_page, route=navigation.routes.ABOUT)
+app.add_page(pages.protected_page, 
+             route=navigation.routes.PROTECTED,
+             on_load=SessionState.on_load)
 app.add_page(pages.pricing_page, route=navigation.routes.PRICING)
 app.add_page(contact.contact_page, route=navigation.routes.CONTACT_US)
 app.add_page(contact.contact_entry_list_page, route=navigation.routes.CONTACT_ENTRIES, 
