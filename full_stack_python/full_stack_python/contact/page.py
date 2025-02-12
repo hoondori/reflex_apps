@@ -7,6 +7,7 @@ def contact_entry(entry: ContactEntryModel) -> rx.Component:
     return rx.vstack(
         rx.heading(entry.first_name, size="3"),
         rx.text(entry.message),
+        rx.text(entry.userinfo_id),
         padding="1em",
     )
 
@@ -25,6 +26,7 @@ def contact_page() -> rx.Component:
     my_form = contact.contact_form()
     return base_page(
         rx.vstack(
+
             rx.heading("Contact Us", size="9"),
             rx.cond(contact.ContactState.did_submit, contact.ContactState.thank_you, ""),
             rx.desktop_only(

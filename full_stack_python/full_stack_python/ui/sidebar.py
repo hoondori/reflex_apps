@@ -139,6 +139,8 @@ def sidebar_items() -> rx.Component:
         sidebar_item("Dashboard", "layout-dashboard", navigation.routes.HOME),
         sidebar_item("Blog", "square-library", navigation.routes.BLOG),
         sidebar_item("Create Post", "square-pen", navigation.routes.BLOG_ADD),
+        sidebar_item("Contact", "mail", navigation.routes.CONTACT_US),
+        sidebar_item("Contact History", "mailbox", navigation.routes.CONTACT_ENTRIES),        
         spacing="1",
         width="100%",
     )
@@ -238,3 +240,4 @@ def sidebar() -> rx.Component:
             padding="1em",
         ),
     )
+    

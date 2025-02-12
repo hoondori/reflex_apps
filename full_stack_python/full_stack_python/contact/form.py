@@ -1,15 +1,42 @@
 import reflex as rx
 from .state import ContactState
+from ..auth.state import SessionState
 
 def contact_form() -> rx.Component:
+
+    
     return rx.form(
+        rx.cond(
+            SessionState.my_user_id,
+            rx.box(
+                rx.input(
+                    type="hidden",
+                    name="userinfo_id",
+                    value=SessionState.my_user_id
+                ),
+                display="none"
+            ),
+            rx.fragment(""),
+        ),
         rx.vstack(
             rx.hstack(
-                rx.input(
-                    name="first_name",                
-                    placeholder="First Name",
-                    required=True,
-                    width="100%"
+                rx.cond(
+                    SessionState.authenticated_username,
+                    rx.input(
+                        name="first_name",                
+                        placeholder="First Name",
+                        required=True,
+                        width="100%",
+                        value=SessionState.authenticated_username,
+                        is_disabled=True,
+                        style={"color": "gray", "background-color": "#e0e0e0", "cursor": "not-allowed"}
+                    ),
+                    rx.input(
+                        name="first_name",                
+                        placeholder="First Name",
+                        required=True,
+                        width="100%"
+                    )                        
                 ),
                 rx.input(
                     name="last_name",
@@ -18,11 +45,23 @@ def contact_form() -> rx.Component:
                 ),
                  width="100%"
             ),
-            rx.input(
-                name="email",
-                type="email",
-                placeholder="name@example.com",
-                width="100%"
+            rx.cond(
+                SessionState.authenticated_user_info,
+                rx.input(
+                    name="email",
+                    type="email",
+                    placeholder="name@example.com",
+                    width="100%",
+                    value=SessionState.authenticated_user_info.email,
+                    is_disabled=True,
+                    style={"color": "gray", "background-color": "#e0e0e0", "cursor": "not-allowed"}
+                ),
+                rx.input(
+                    name="email",
+                    type="email",
+                    placeholder="name@example.com",
+                    width="100%"
+                ),                                
             ),
             rx.text_area(
                 name="message",

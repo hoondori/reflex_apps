@@ -5,6 +5,8 @@ from datetime import datetime
 from ..utils import timing
 
 class ContactEntryModel(rx.Model, table=True):
+    # id: int -> primary key
+    userinfo_id: int | None = None
     first_name: str
     last_name: str | None = None
     email: str = Field(nullable=True)
