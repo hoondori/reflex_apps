@@ -3,7 +3,7 @@ import reflex as rx
 import reflex_local_auth
 import sqlmodel
 from reflex_local_auth.pages.components import input_100w, MIN_WIDTH, PADDING_TOP
-from .model import UserInfo
+from ..model import UserInfo
 
 
 class MyRegisterState(reflex_local_auth.RegistrationState):
@@ -26,6 +26,12 @@ class MyRegisterState(reflex_local_auth.RegistrationState):
 
 class SessionState(reflex_local_auth.LocalAuthState):
     
+    @rx.var(cache=True)
+    def my_userinfo_id(self) -> str | None:
+        if self.authenticated_user_info is None:
+            return None
+        return self.authenticated_user_info.id
+
     @rx.var(cache=True)
     def my_user_id(self) -> int:
         if self.authenticated_user.id < 0:

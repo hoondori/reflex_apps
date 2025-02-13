@@ -4,20 +4,7 @@ from ..auth.state import SessionState
 
 def contact_form() -> rx.Component:
 
-    
     return rx.form(
-        rx.cond(
-            SessionState.my_user_id,
-            rx.box(
-                rx.input(
-                    type="hidden",
-                    name="userinfo_id",
-                    value=SessionState.my_user_id
-                ),
-                display="none"
-            ),
-            rx.fragment(""),
-        ),
         rx.vstack(
             rx.hstack(
                 rx.cond(

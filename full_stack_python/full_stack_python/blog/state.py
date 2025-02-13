@@ -1,10 +1,12 @@
-import reflex as rx 
 from typing import List, Optional
-from .model import BlogPostModel
+import reflex as rx 
 from sqlmodel import select
 from datetime import datetime
+import sqlalchemy
+from ..model import BlogPostModel, UserInfo
+from ..auth.state import SessionState
 
-class BlogPostState(rx.State):
+class BlogPostState(SessionState):
     posts: List['BlogPostModel'] = []
     post: Optional['BlogPostModel'] = None
     post_content:str = ""
@@ -15,16 +17,21 @@ class BlogPostState(rx.State):
         return self.router.page.params.get("blog_id") or None
     
     def load_posts(self):
+        # load user's post only
         with rx.session() as session:
+            # BlogPostModel.join(Userinfo)
             result = session.exec(
                 select(BlogPostModel)
+                .options(sqlalchemy.orm.joinedload(BlogPostModel.userinfo))
+                .where(BlogPostModel.userinfo_id == self.my_userinfo_id)
             ).all()
+            
             self.posts = result
         
 
     def add_post(self, form_data: dict):
         with rx.session() as session:
-            post = BlogPostModel(**form_data)
+            post = BlogPostModel(**form_data)            
             session.add(post)
             session.commit()
             session.refresh(post) # due to post.id
@@ -51,16 +58,31 @@ class BlogPostState(rx.State):
             self.post_content = post.content
         
     def get_post_detail(self):
+        # if not logged, then nullify all
+        if self.my_userinfo_id is None:
+            self.post = None
+            self.post_content = ""
+            self.post_publish_active = False
+        
+        # 자기가 작성한 것
+        lookups = (
+            (BlogPostModel.userinfo_id == self.my_userinfo_id) &
+            (BlogPostModel.id == self.blog_post_id)
+        )
         with rx.session() as session:
             if self.blog_post_id == "":
                 self.post = None
-            result = session.exec(
-                select(BlogPostModel).where(
-                    BlogPostModel.id == self.blog_post_id
-                )
-            ).one_or_none()
-
-            self.post = result
+                return 
+            
+            # BlogPost.join(UserInfo).join(User)
+            sql_statement = select(BlogPostModel).options(
+                sqlalchemy.orm.joinedload(BlogPostModel.userinfo).joinedload(UserInfo.user)
+            ).where(lookups)
+            result = session.exec(sql_statement).one_or_none()
+            self.post = result 
+            if result is None: # post 가 None이면 content도 None
+                self.post_content = ""
+                return 
             self.post_content = result.content
             self.post_publish_active = result.publish_active
 
@@ -73,8 +95,12 @@ class BlogAddFormState(BlogPostState):
     form_data: dict = {}
 
     def handle_submit(self, form_data):
-        self.form_data = form_data
-        self.add_post(form_data)
+        data = form_data.copy()
+        # add userinfo if loggined
+        if self.my_userinfo_id is not None:
+            data['userinfo_id'] = self.my_userinfo_id
+        self.form_data = data
+        self.add_post(data)
         return self.to_blog_post()
 
 class BlogEditFormState(BlogPostState):

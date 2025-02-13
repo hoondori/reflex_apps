@@ -1,13 +1,14 @@
 import reflex as rx 
 from ..ui.base import base_page
-from . import model, state, form
+from .state import BlogPostState
 from .. import navigation
+from ..model import BlogPostModel
 
 
 def blog_post_detail_page():
 
     can_edit = True
-    edit_link = rx.link('Edit', href=f"/blog/{state.BlogPostState.blog_post_id}/edit")
+    edit_link = rx.link('Edit', href=f"/blog/{BlogPostState.blog_post_id}/edit")
     edit_link_el = rx.cond(
         can_edit,
         edit_link,
@@ -15,12 +16,13 @@ def blog_post_detail_page():
     )
     my_child = rx.vstack(
         rx.hstack(
-            rx.heading(state.BlogPostState.post.title, size="7"),
+            rx.heading(BlogPostState.post.title, size="7"),
             edit_link_el,
         ),
-        rx.text(state.BlogPostState.post.publish_date),
+        rx.cond(BlogPostState.post.userinfo, rx.text(BlogPostState.post.userinfo.email), rx.fragment("")),
+        rx.text(BlogPostState.post.publish_date),
         rx.text(
-            state.BlogPostState.post.content, 
+            BlogPostState.post.content, 
             white_space='pre-wrap',
         ),            
         spacing="5",
@@ -32,7 +34,7 @@ def blog_post_detail_page():
         my_child
     )    
 
-def blog_post_detail_link(child: rx.Component, post: model.BlogPostModel):
+def blog_post_detail_link(child: rx.Component, post: BlogPostModel):
     """ generate link with post id """
 
     if post is None:
@@ -47,10 +49,14 @@ def blog_post_detail_link(child: rx.Component, post: model.BlogPostModel):
         href=post_detail_url
     )
 
-def blog_post_entry(blog_post: model.BlogPostModel) -> rx.Component:
+def blog_post_entry(blog_post: BlogPostModel) -> rx.Component:
     return rx.vstack(
         blog_post_detail_link(
-            rx.heading(blog_post.title, size="3"),
+            rx.vstack(
+                rx.heading(blog_post.title, size="3"),
+                rx.cond(blog_post.userinfo, rx.text(blog_post.userinfo.email), rx.fragment("")),
+                align="center",
+            ),
             blog_post
         ),
         padding="1em",
@@ -64,7 +70,7 @@ def blog_post_list_page() -> rx.Component:
                 rx.button("New Post"),
                 href=navigation.routes.BLOG_ADD,
             ),
-            rx.foreach(state.BlogPostState.posts, blog_post_entry),
+            rx.foreach(BlogPostState.posts, blog_post_entry),
             spacing="5",
             align="center",
             min_height="85vh",

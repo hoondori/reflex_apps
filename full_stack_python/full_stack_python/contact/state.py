@@ -1,10 +1,11 @@
 from typing import List
 import reflex as rx 
 import asyncio
-from .model import ContactEntryModel
+from .. model import ContactEntryModel
+from ..auth.state import SessionState
 from sqlmodel import select
 
-class ContactState(rx.State):
+class ContactState(SessionState):
     form_data: dict = {}
     entries: List['ContactEntryModel'] = []
     did_submit: bool = False
@@ -15,14 +16,14 @@ class ContactState(rx.State):
         return f"Thank you {first_name.strip()}" + "!"
 
     async def handle_submit(self, form_data: dict):
-        self.form_data = form_data
-        data = {}
-        for k, v in form_data.items():
+        data = form_data.copy()
+        # add userinfo if loggined
+        if self.my_userinfo_id is not None:
+            data['userinfo_id'] = self.my_userinfo_id
+        for k, v in data.items():
             if v == "" or v is None:
                 continue
             data[k] = v
-
-        print(form_data)
 
         with rx.session() as session:
             db_entry = ContactEntryModel(

@@ -1,11 +1,14 @@
 import reflex as rx 
 from ..ui.base import base_page
 from .. import contact
-from .model import ContactEntryModel
+from ..model import ContactEntryModel
+from .state import ContactState
 
 def contact_entry(entry: ContactEntryModel) -> rx.Component:
     return rx.vstack(
         rx.heading(entry.first_name, size="3"),
+        rx.text(entry.userinfo),
+        rx.cond(entry.userinfo, rx.text(entry.userinfo.email), rx.fragment("")),        
         rx.text(entry.message),
         rx.text(entry.userinfo_id),
         padding="1em",
